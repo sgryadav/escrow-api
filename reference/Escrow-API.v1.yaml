@@ -98,9 +98,9 @@ paths:
                 - items
                 - parties
         description: ''
-  /user:
+  /customer:
     post:
-      summary: Create New User
+      summary: Customer
       operationId: post-user
       responses:
         '200':
@@ -138,6 +138,27 @@ paths:
                 dateOfBirth:
                   type: string
                   format: date
+                middle_name:
+                  type: string
+                address:
+                  type: object
+                  properties:
+                    line1:
+                      type: string
+                    line2:
+                      type: string
+                    city:
+                      type: string
+                    state:
+                      type: string
+                    country:
+                      type: string
+                    post_code:
+                      type: string
+                phone_number:
+                  type: string
+                '':
+                  type: string
               required:
                 - firstName
                 - lastName
@@ -150,8 +171,9 @@ paths:
                   lastName: Fellow
                   email: bob.fellow@gmail.com
                   dateOfBirth: '1996-08-24'
-        description: Post the necessary fields for the API to create a new user.
-      description: Create a new user.
+        description: ''
+      description: Create a new customer.
+    parameters: []
   '/transaction/{id}':
     parameters:
       - schema:
@@ -267,6 +289,87 @@ paths:
         '200':
           description: OK
       description: 'Pay with credit card '
+  '/customer/{customer_id}':
+    parameters:
+      - schema:
+          type: string
+        name: customer_id
+        in: path
+        required: true
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses: {}
+      operationId: get-customer-customer_id
+      description: Retrieve customer details
+    patch:
+      summary: ''
+      operationId: patch-customer-customer_id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  display_name:
+                    type: string
+                  electronic_verification:
+                    type: object
+                    properties:
+                      available:
+                        type: boolean
+                      documents_supported:
+                        type: array
+                        items: {}
+                  email:
+                    type: string
+                  first_name:
+                    type: string
+                  id:
+                    type: number
+                  verification:
+                    type: object
+                    properties:
+                      company:
+                        type: object
+                        properties:
+                          status:
+                            type: string
+                      personal:
+                        type: object
+                        properties:
+                          status:
+                            type: string
+              examples:
+                Response:
+                  value:
+                    display_name: string
+                    electronic_verification:
+                      available: true
+                      documents_supported:
+                        - null
+                    email: string
+                    first_name: string
+                    id: 0
+                    verification:
+                      company:
+                        status: string
+                      personal:
+                        status: string
+        '201':
+          description: ''
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+            examples:
+              First Name:
+                value:
+                  first_name: updated first name
 components:
   schemas:
     User:
@@ -315,3 +418,12 @@ components:
       type: apiKey
       in: header
       name: API Key
+  responses:
+    The:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            properties:
+              id:
+                type: string
