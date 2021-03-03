@@ -1,0 +1,317 @@
+openapi: 3.0.0
+info:
+  title: Escrow-API
+  version: '1.0'
+servers:
+  - url: 'https://api.escrow.com/v2'
+paths:
+  /transaction:
+    parameters: []
+    post:
+      summary: Create transaction
+      operationId: post-transaction
+      responses:
+        '200':
+          description: OK
+      description: Create transaction
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                currency:
+                  type: string
+                description:
+                  type: string
+                id:
+                  type: string
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      fees:
+                        type: object
+                        properties:
+                          amount:
+                            type: string
+                          payer_customer:
+                            type: string
+                          type:
+                            type: string
+                      schedule:
+                        type: object
+                        properties:
+                          amount:
+                            type: string
+                          beneficiary_customer:
+                            type: string
+                          payer_customer:
+                            type: string
+                    required:
+                      - schedule
+                parties:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      role:
+                        type: string
+                      customer:
+                        type: string
+                      agreed:
+                        type: string
+                      initiator:
+                        type: string
+                      first_name:
+                        type: string
+                      last_name:
+                        type: string
+                      phone_number:
+                        type: string
+                      address:
+                        type: object
+                        properties:
+                          line1:
+                            type: string
+                          line2:
+                            type: string
+                          city:
+                            type: string
+                          state:
+                            type: string
+                          country:
+                            type: string
+                          post_code:
+                            type: string
+                      date_of_birth:
+                        type: string
+                    required:
+                      - role
+                      - customer
+                      - agreed
+              required:
+                - currency
+                - description
+                - id
+                - items
+                - parties
+        description: ''
+  /user:
+    post:
+      summary: Create New User
+      operationId: post-user
+      responses:
+        '200':
+          description: User Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                New User Bob Fellow:
+                  value:
+                    id: 12
+                    firstName: Bob
+                    lastName: Fellow
+                    email: bob.fellow@gmail.com
+                    dateOfBirth: '1996-08-24'
+                    emailVerified: false
+                    createDate: '2020-11-18'
+        '400':
+          description: Missing Required Information
+        '409':
+          description: Email Already Taken
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                email:
+                  type: string
+                dateOfBirth:
+                  type: string
+                  format: date
+              required:
+                - firstName
+                - lastName
+                - email
+                - dateOfBirth
+            examples:
+              Create User Bob Fellow:
+                value:
+                  firstName: Bob
+                  lastName: Fellow
+                  email: bob.fellow@gmail.com
+                  dateOfBirth: '1996-08-24'
+        description: Post the necessary fields for the API to create a new user.
+      description: Create a new user.
+  '/transaction/{id}':
+    parameters:
+      - schema:
+          type: integer
+          example: 12345
+        name: id
+        in: path
+        required: true
+        description: Transaction ID
+    patch:
+      summary: Transaction Actions
+      operationId: patch-transaction-id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  '':
+                    type: string
+            application/xml:
+              schema:
+                type: object
+                properties: {}
+      description: Perform an action on a specified transaction
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  example: agree
+                  enum:
+                    - agree
+                    - ship
+                    - receive
+                    - accept
+                    - reject
+                    - ship_return
+                    - receive_return
+                    - reject_return
+            examples:
+              agree:
+                value:
+                  action: agree
+              ship:
+                value:
+                  action: ship
+              receive:
+                value:
+                  action: receive
+              accept:
+                value:
+                  action: accept
+              reject:
+                value:
+                  action: reject
+              ship_return:
+                value:
+                  action: ship_return
+              receive_return:
+                value:
+                  action: receive_return
+              accept_return:
+                value:
+                  action: accept_return
+              reject_return:
+                value:
+                  action: reject_return
+              cancel:
+                value:
+                  action: cancel
+                  cancel_information:
+                    cancellation_reason: Listing was not authorized
+          application/x-tex:
+            schema:
+              type: object
+              properties: {}
+        description: Action to perform on transaction
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: As-Customer
+          description: customer email address
+          required: true
+  '/transaction/{id}/payment_methods/{payment_method}':
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses: {}
+      operationId: ''
+      description: 'Retrieve available payment methods for transaction. Payment methods available are dependent on transaction amount, currency, and geolocation of parties involved.'
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: payment_method
+        in: path
+        required: true
+    post:
+      summary: ''
+      operationId: post-transaction-id-payment_methods
+      responses:
+        '200':
+          description: OK
+      description: 'Pay with credit card '
+components:
+  schemas:
+    User:
+      title: User
+      type: object
+      description: ''
+      x-examples:
+        Alice Smith:
+          id: 142
+          firstName: Alice
+          lastName: Smith
+          email: alice.smith@gmail.com
+          dateOfBirth: '1997-10-31'
+          emailVerified: true
+          signUpDate: '2019-08-24'
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the given user.
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        dateOfBirth:
+          type: string
+          format: date
+          example: '1997-10-31'
+        emailVerified:
+          type: boolean
+          description: Set to true if the user's email has been verified.
+        createDate:
+          type: string
+          format: date
+          description: The date that the user was created.
+      required:
+        - id
+        - firstName
+        - lastName
+        - email
+        - emailVerified
+  securitySchemes:
+    Email Address:
+      type: apiKey
+      in: header
+      name: API Key
